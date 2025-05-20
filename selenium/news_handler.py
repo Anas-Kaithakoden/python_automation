@@ -1,32 +1,31 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 import pandas as pd
-website = "https://www.thesun.co.uk/sport/football/"
-path = "/home/anas/Downloads/chromedriver"
 
-service = Service(excecutable_path=path)
-driver = webdriver.Chrome(service=service)
+website = "https://www.skysports.com/football"
+path = "/home/anas/Downloads/chromedriver-linux64/chromedriver"
+
+#headless mode
+options = Options()
+options.add_argument("--headless=new")
+
+service = Service(executable_path=path)
+driver = webdriver.Chrome(service=service, options=options)
 driver.get(website)
 
 
-results = driver.find_elements(by="xpath", value='//div[@class="teaser__copy-container"]') # get the container
+results = driver.find_elements(by="xpath", value='//a[@class="sdc-site-tile__headline-link"]') # get the container
 
 titles = []
-subtitles = []
-links = []
+
 
 for result in results: #store each data
-    title = result.find_element(by="xpath", value='./a/span').text
+    title = result.find_element(by="xpath", value='//a[@class="sdc-site-tile__headline-link"]').get_attribute("href")
     titles.append(title)
-
-    subtitle = result.find_element(by="xpath", value='./a/h3').text
-    subtitles.append(subtitle)
-
-    link = result.find_element(by="xpath", value='/a').get_attribute("href")
-    links.append[link]
-
-my_dict = {'title': titles, 'subtitle':subtitles, 'link':links}
+   
+my_dict = {'title': titles}
 headlines = pd.DataFrame(my_dict)
-headlines.to_csv('headline.csv')
+headlines.to_csv('headline_headless.csv')
 
 driver.quit()
